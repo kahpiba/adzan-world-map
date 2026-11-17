@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b172a" />
+    <title>Adzan Atlas - Peta Waktu Shalat Dunia</title>
+    <link rel="preconnect" href="https://unpkg.com" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">ADZAN ATLAS</p>
+          <h1>Waktu shalat dunia, <span>di satu peta.</span></h1>
+          <p class="hero-copy">
+            Pilih lokasi mana pun untuk melihat jadwal adzan hari ini berdasarkan koordinat dan metode
+            perhitungan yang dipilih.
+          </p>
+        </div>
+        <div class="date-card">
+          <span id="hijri-date">Memuat tanggal...</span>
+          <strong id="gregorian-date">—</strong>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Kontrol lokasi">
+        <label class="search-box">
+          <span aria-hidden="true">⌕</span>
+          <input id="location-search" type="search" placeholder="Cari kota atau negara..." autocomplete="off" />
+          <button id="search-button" type="button">Cari</button>
+        </label>
+        <button id="locate-button" class="secondary-button" type="button">◎ Gunakan lokasi saya</button>
+        <label class="method-select">
+          <span>Metode</span>
+          <select id="calculation-method">
+            <option value="20">Kementerian Agama RI</option>
+            <option value="2">ISNA</option>
+            <option value="3">MWL</option>
+            <option value="4">Umm Al-Qura</option>
+            <option value="5">Egyptian General Authority</option>
+          </select>
+        </label>
+      </section>
+
+      <div id="status" class="status" role="status">Klik peta atau cari lokasi untuk memulai.</div>
+
+      <section class="dashboard">
+        <div id="map" aria-label="Peta dunia interaktif"></div>
+        <aside class="prayer-panel">
+          <div class="place-heading">
+            <div class="location-pin">✦</div>
+            <div>
+              <p class="eyebrow">LOKASI TERPILIH</p>
+              <h2 id="selected-location">Belum ada lokasi</h2>
+              <p id="coordinates">Klik titik di peta untuk memilih lokasi.</p>
+            </div>
+          </div>
+          <div id="prayer-list" class="prayer-list">
+            <div class="empty-state">Jadwal shalat akan tampil di sini.</div>
+          </div>
+          <p class="attribution">
+            Data waktu shalat dari <a href="https://aladhan.com/prayer-times-api" target="_blank" rel="noreferrer">AlAdhan API</a>.
+            Waktu dapat berbeda sesuai metode dan kriteria lokal.
+          </p>
+        </aside>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
