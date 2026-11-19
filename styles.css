@@ -75,6 +75,12 @@ h2 { font-size: 1.45rem; margin: 0; }
 .attribution a { color: var(--mint); }
 .leaflet-container { font-family: inherit; }
 .leaflet-control-zoom a { background: var(--panel) !important; color: white !important; border-color: var(--line) !important; }
+.adhan-travel-marker { width: 42px !important; height: 42px !important; margin-left: -21px !important; margin-top: -21px !important; border-radius: 50%; background: rgba(109, 224, 189, 0.16); border: 2px solid #ffffff; box-shadow: 0 0 0 7px rgba(109, 224, 189, 0.24), 0 0 28px 8px rgba(109, 224, 189, 0.48); animation: adhan-map-pulse 1.25s ease-out infinite; }
+.adhan-travel-marker::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #6de0bd; }
+.adhan-stop-marker { width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 50%; background: #6de0bd; border: 2px solid #091525; box-shadow: 0 0 12px rgba(109, 224, 189, 0.9); }
+.adhan-map-tooltip { background: #091525 !important; color: #ffffff !important; border: 1px solid rgba(109, 224, 189, 0.5) !important; border-radius: 8px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.28) !important; font-weight: 800; }
+.adhan-map-tooltip::before { border-top-color: #091525 !important; }
+@keyframes adhan-map-pulse { 0% { transform: scale(0.92); } 50% { transform: scale(1.08); } 100% { transform: scale(0.92); } }
 
 @media (max-width: 900px) {
   .app-shell { width: min(100% - 28px, 720px); padding-top: 28px; }

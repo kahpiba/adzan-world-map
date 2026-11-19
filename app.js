@@ -39,12 +39,21 @@ const continuityStops = [
 
 function startContinuityAnimation() {
   const route = continuityStops.map(({ point }) => point);
-  const routeLine = L.polyline(route, { color: "#6de0bd", weight: 2, opacity: 0.32, dashArray: "5 10" }).addTo(map);
-  const stopDots = continuityStops.map(({ point }) =>
-    L.circleMarker(point, { radius: 4, color: "#6de0bd", weight: 1, fillColor: "#6de0bd", fillOpacity: 0.75 }).addTo(map)
-  );
-  const activeDot = L.circleMarker(route[0], { radius: 8, color: "#ffffff", weight: 2, fillColor: "#6de0bd", fillOpacity: 1 }).addTo(map);
-  const segmentDuration = 2600;
+  const routeLine = L.polyline(route, { color: "#6de0bd", weight: 4, opacity: 0.78, dashArray: "12 10", pane: "overlayPane" }).addTo(map);
+  const stopDots = continuityStops.map(({ point }, index) => {
+    const icon = L.divIcon({ className: "adhan-stop-marker", iconSize: [12, 12] });
+    return L.marker(point, { icon, zIndexOffset: 400 }).addTo(map)
+      .bindTooltip(continuityStops[index].name, { permanent: false, direction: "top", className: "adhan-map-tooltip" });
+  });
+  const travelIcon = L.divIcon({
+    className: "adhan-travel-marker",
+    iconSize: [42, 42],
+    iconAnchor: [21, 21],
+  });
+  const activeDot = L.marker(route[0], { icon: travelIcon, zIndexOffset: 1000 })
+    .addTo(map)
+    .bindTooltip(continuityStops[0].name, { permanent: true, offset: [0, -28], direction: "top", className: "adhan-map-tooltip" });
+  const segmentDuration = 4200;
   let segment = 0;
   let startedAt = performance.now();
   let paused = false;
@@ -58,6 +67,7 @@ function startContinuityAnimation() {
       const lat = from[0] + (to[0] - from[0]) * progress;
       const lng = from[1] + (to[1] - from[1]) * progress;
       activeDot.setLatLng([lat, lng]);
+      activeDot.setTooltipContent(`${continuityStops[segment].name} · ${continuityStops[segment].phase}`);
       elements.continuityLocation.textContent = continuityStops[segment].name;
       elements.continuityPhase.textContent = continuityStops[segment].phase;
       elements.continuityProgress.style.width = `${progress * 100}%`;
