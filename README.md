@@ -10,6 +10,7 @@ Peta dunia interaktif untuk melihat waktu shalat berdasarkan lokasi yang dipilih
 - Jadwal Subuh, Terbit, Dzuhur, Ashar, Maghrib, dan Isya.
 - Pilihan metode perhitungan waktu shalat.
 - Tanggal Masehi dan Hijriah.
+- Animasi estafet lintas zona waktu sebagai model edukasi kontinuitas waktu adzan.
 
 ## Menjalankan lokal
 
@@ -24,3 +25,7 @@ Lalu buka URL yang ditampilkan. Aplikasi ini tidak membutuhkan API key. Data jad
 ## Catatan
 
 Jadwal dapat berbeda dengan jadwal masjid setempat. Gunakan metode perhitungan yang sesuai dengan wilayah Anda.
+
+Animasi kontinuitas menggunakan beberapa kota contoh untuk menggambarkan hubungan antara rotasi bumi,
+zona waktu, dan waktu lokal. Animasi tersebut bukan bukti ilmiah bahwa adzan secara absolut tidak pernah
+berhenti hingga akhir zaman.

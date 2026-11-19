@@ -15,10 +15,74 @@ const elements = {
   prayerList: document.querySelector("#prayer-list"),
   hijriDate: document.querySelector("#hijri-date"),
   gregorianDate: document.querySelector("#gregorian-date"),
+  continuityLocation: document.querySelector("#continuity-location"),
+  continuityPhase: document.querySelector("#continuity-phase"),
+  continuityProgress: document.querySelector("#continuity-progress-bar"),
+  continuityToggle: document.querySelector("#continuity-toggle"),
 };
 
 let marker;
 let activeRequest = 0;
+let continuityAnimation;
+
+const continuityStops = [
+  { name: "Makkah, Arab Saudi", phase: "Fajar → Subuh", point: [21.4225, 39.8262] },
+  { name: "Karachi, Pakistan", phase: "Subuh → Terbit", point: [24.8607, 67.0011] },
+  { name: "Jakarta, Indonesia", phase: "Dzuhur", point: [-6.2088, 106.8456] },
+  { name: "Kuala Lumpur, Malaysia", phase: "Ashar", point: [3.139, 101.6869] },
+  { name: "Tokyo, Jepang", phase: "Maghrib", point: [35.6762, 139.6503] },
+  { name: "Istanbul, Turki", phase: "Isya", point: [41.0082, 28.9784] },
+  { name: "London, Inggris", phase: "Fajar → Subuh", point: [51.5072, -0.1276] },
+  { name: "New York, Amerika Serikat", phase: "Subuh → Terbit", point: [40.7128, -74.006] },
+  { name: "São Paulo, Brasil", phase: "Dzuhur", point: [-23.5505, -46.6333] },
+];
+
+function startContinuityAnimation() {
+  const route = continuityStops.map(({ point }) => point);
+  const routeLine = L.polyline(route, { color: "#6de0bd", weight: 2, opacity: 0.32, dashArray: "5 10" }).addTo(map);
+  const stopDots = continuityStops.map(({ point }) =>
+    L.circleMarker(point, { radius: 4, color: "#6de0bd", weight: 1, fillColor: "#6de0bd", fillOpacity: 0.75 }).addTo(map)
+  );
+  const activeDot = L.circleMarker(route[0], { radius: 8, color: "#ffffff", weight: 2, fillColor: "#6de0bd", fillOpacity: 1 }).addTo(map);
+  const segmentDuration = 2600;
+  let segment = 0;
+  let startedAt = performance.now();
+  let paused = false;
+  let pausedAt = 0;
+
+  const update = (now) => {
+    if (!paused) {
+      const progress = Math.min((now - startedAt) / segmentDuration, 1);
+      const from = route[segment];
+      const to = route[(segment + 1) % route.length];
+      const lat = from[0] + (to[0] - from[0]) * progress;
+      const lng = from[1] + (to[1] - from[1]) * progress;
+      activeDot.setLatLng([lat, lng]);
+      elements.continuityLocation.textContent = continuityStops[segment].name;
+      elements.continuityPhase.textContent = continuityStops[segment].phase;
+      elements.continuityProgress.style.width = `${progress * 100}%`;
+      if (progress === 1) {
+        segment = (segment + 1) % route.length;
+        startedAt = now;
+      }
+    }
+    continuityAnimation.frame = requestAnimationFrame(update);
+  };
+
+  continuityAnimation = {
+    frame: requestAnimationFrame(update),
+    toggle() {
+      paused = !paused;
+      if (paused) pausedAt = performance.now();
+      else startedAt += performance.now() - pausedAt;
+      elements.continuityToggle.textContent = paused ? "▶ Lanjut" : "❚❚ Jeda";
+      elements.continuityToggle.setAttribute("aria-pressed", String(!paused));
+    },
+    routeLine,
+    stopDots,
+    activeDot,
+  };
+}
 
 function getLocalDate() {
   const now = new Date();
@@ -127,3 +191,5 @@ elements.locateButton.addEventListener("click", () => {
     { enableHighAccuracy: true, timeout: 10000 }
   );
 });
+elements.continuityToggle.addEventListener("click", () => continuityAnimation?.toggle());
+startContinuityAnimation();
