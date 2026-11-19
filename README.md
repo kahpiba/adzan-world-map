@@ -11,6 +11,8 @@ Peta dunia interaktif untuk melihat waktu shalat berdasarkan lokasi yang dipilih
 - Pilihan metode perhitungan waktu shalat.
 - Tanggal Masehi dan Hijriah.
 - Animasi estafet lintas zona waktu sebagai model edukasi kontinuitas waktu adzan.
+- Gelombang resonansi berwarna di peta untuk Subuh (biru), Terbit (emas), Dzuhur (oranye),
+  Ashar (kuning), Maghrib (merah), dan Isya (ungu).
 
 ## Menjalankan lokal
 

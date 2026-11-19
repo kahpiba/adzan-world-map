@@ -7,7 +7,7 @@
     <title>Adzan Atlas - Peta Waktu Shalat Dunia</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=2" />
+    <link rel="stylesheet" href="styles.css?v=3" />
   </head>
   <body>
     <main class="app-shell">
@@ -62,7 +62,7 @@
         </div>
         <div class="continuity-status">
           <div class="continuity-location">
-            <span class="pulse-dot" aria-hidden="true"></span>
+            <span id="continuity-pulse" class="pulse-dot" aria-hidden="true"></span>
             <div>
               <span class="label">SEDANG BERLANGSUNG DI</span>
               <strong id="continuity-location">Makkah, Arab Saudi</strong>
@@ -72,6 +72,14 @@
           <div class="continuity-meta">
             <span id="continuity-phase">Fajar → Subuh</span>
             <button id="continuity-toggle" class="secondary-button" type="button" aria-pressed="true">❚❚ Jeda</button>
+          </div>
+          <div class="prayer-resonance-legend" aria-label="Legenda warna fase adzan">
+            <span><i style="--phase:#4da3ff"></i>Subuh</span>
+            <span><i style="--phase:#ffd166"></i>Terbit</span>
+            <span><i style="--phase:#ff8c42"></i>Dzuhur</span>
+            <span><i style="--phase:#f6b94a"></i>Ashar</span>
+            <span><i style="--phase:#ef6f61"></i>Maghrib</span>
+            <span><i style="--phase:#7c83fd"></i>Isya</span>
           </div>
         </div>
       </section>
@@ -99,6 +107,6 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=3"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>

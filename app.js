@@ -19,6 +19,7 @@ const elements = {
   continuityPhase: document.querySelector("#continuity-phase"),
   continuityProgress: document.querySelector("#continuity-progress-bar"),
   continuityToggle: document.querySelector("#continuity-toggle"),
+  continuityPulse: document.querySelector("#continuity-pulse"),
 };
 
 let marker;
@@ -26,15 +27,15 @@ let activeRequest = 0;
 let continuityAnimation;
 
 const continuityStops = [
-  { name: "Makkah, Arab Saudi", phase: "Fajar → Subuh", point: [21.4225, 39.8262] },
-  { name: "Karachi, Pakistan", phase: "Subuh → Terbit", point: [24.8607, 67.0011] },
-  { name: "Jakarta, Indonesia", phase: "Dzuhur", point: [-6.2088, 106.8456] },
-  { name: "Kuala Lumpur, Malaysia", phase: "Ashar", point: [3.139, 101.6869] },
-  { name: "Tokyo, Jepang", phase: "Maghrib", point: [35.6762, 139.6503] },
-  { name: "Istanbul, Turki", phase: "Isya", point: [41.0082, 28.9784] },
-  { name: "London, Inggris", phase: "Fajar → Subuh", point: [51.5072, -0.1276] },
-  { name: "New York, Amerika Serikat", phase: "Subuh → Terbit", point: [40.7128, -74.006] },
-  { name: "São Paulo, Brasil", phase: "Dzuhur", point: [-23.5505, -46.6333] },
+  { name: "Makkah, Arab Saudi", phase: "Subuh", prayer: "Subuh", color: "#4da3ff", point: [21.4225, 39.8262] },
+  { name: "Karachi, Pakistan", phase: "Terbit", prayer: "Terbit", color: "#ffd166", point: [24.8607, 67.0011] },
+  { name: "Jakarta, Indonesia", phase: "Dzuhur", prayer: "Dzuhur", color: "#ff8c42", point: [-6.2088, 106.8456] },
+  { name: "Kuala Lumpur, Malaysia", phase: "Ashar", prayer: "Ashar", color: "#f6b94a", point: [3.139, 101.6869] },
+  { name: "Tokyo, Jepang", phase: "Maghrib", prayer: "Maghrib", color: "#ef6f61", point: [35.6762, 139.6503] },
+  { name: "Istanbul, Turki", phase: "Isya", prayer: "Isya", color: "#7c83fd", point: [41.0082, 28.9784] },
+  { name: "London, Inggris", phase: "Subuh", prayer: "Subuh", color: "#4da3ff", point: [51.5072, -0.1276] },
+  { name: "New York, Amerika Serikat", phase: "Dzuhur", prayer: "Dzuhur", color: "#ff8c42", point: [40.7128, -74.006] },
+  { name: "São Paulo, Brasil", phase: "Ashar", prayer: "Ashar", color: "#f6b94a", point: [-23.5505, -46.6333] },
 ];
 
 function startContinuityAnimation() {
@@ -49,15 +50,28 @@ function startContinuityAnimation() {
     className: "adhan-travel-marker",
     iconSize: [42, 42],
     iconAnchor: [21, 21],
+    html: `<span style="background:${continuityStops[0].color};box-shadow:0 0 18px ${continuityStops[0].color}"></span>`,
   });
   const activeDot = L.marker(route[0], { icon: travelIcon, zIndexOffset: 1000 })
     .addTo(map)
     .bindTooltip(continuityStops[0].name, { permanent: true, offset: [0, -28], direction: "top", className: "adhan-map-tooltip" });
+  const resonanceRings = [0, 1, 2].map((ringIndex) =>
+    L.circle(route[0], {
+      radius: 180000 + ringIndex * 350000,
+      color: continuityStops[0].color,
+      weight: ringIndex === 0 ? 3 : 2,
+      opacity: 0.82 - ringIndex * 0.18,
+      fillColor: continuityStops[0].color,
+      fillOpacity: 0.13 - ringIndex * 0.025,
+      interactive: false,
+    }).addTo(map)
+  );
   const segmentDuration = 4200;
   let segment = 0;
   let startedAt = performance.now();
   let paused = false;
   let pausedAt = 0;
+  let activeColor = continuityStops[0].color;
 
   const update = (now) => {
     if (!paused) {
@@ -67,7 +81,30 @@ function startContinuityAnimation() {
       const lat = from[0] + (to[0] - from[0]) * progress;
       const lng = from[1] + (to[1] - from[1]) * progress;
       activeDot.setLatLng([lat, lng]);
-      activeDot.setTooltipContent(`${continuityStops[segment].name} · ${continuityStops[segment].phase}`);
+      const stop = continuityStops[segment];
+      activeDot.setTooltipContent(`${stop.name} · ${stop.phase}`);
+      if (activeColor !== stop.color) {
+        activeColor = stop.color;
+        activeDot.setIcon(L.divIcon({
+          className: "adhan-travel-marker",
+          iconSize: [42, 42],
+          iconAnchor: [21, 21],
+          html: `<span style="background:${stop.color};box-shadow:0 0 18px ${stop.color}"></span>`,
+        }));
+        elements.continuityPulse.style.background = stop.color;
+        elements.continuityPulse.style.boxShadow = `0 0 14px ${stop.color}`;
+      }
+      resonanceRings.forEach((ring, ringIndex) => {
+        const pulse = (progress + ringIndex * 0.22) % 1;
+        ring.setLatLng([lat, lng]);
+        ring.setStyle({
+          color: stop.color,
+          fillColor: stop.color,
+          opacity: Math.max(0.12, 0.88 - pulse * 0.7),
+          fillOpacity: Math.max(0.025, 0.16 - pulse * 0.14),
+        });
+        ring.setRadius(140000 + pulse * (650000 + ringIndex * 220000));
+      });
       elements.continuityLocation.textContent = continuityStops[segment].name;
       elements.continuityPhase.textContent = continuityStops[segment].phase;
       elements.continuityProgress.style.width = `${progress * 100}%`;

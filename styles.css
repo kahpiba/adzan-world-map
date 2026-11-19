@@ -56,6 +56,9 @@ h1 span { color: var(--mint); }
 .continuity-progress span { display: block; width: 0; height: 100%; border-radius: inherit; background: var(--mint); }
 .continuity-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); font-size: 0.78rem; }
 .continuity-meta .secondary-button { padding: 8px 11px; font-size: 0.74rem; }
+.prayer-resonance-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px 10px; margin-top: 16px; color: var(--muted); font-size: 0.68rem; }
+.prayer-resonance-legend span { display: flex; align-items: center; gap: 6px; }
+.prayer-resonance-legend i { width: 8px; height: 8px; border-radius: 50%; background: var(--phase); box-shadow: 0 0 8px var(--phase); }
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(109, 224, 189, 0.65); } 50% { box-shadow: 0 0 0 9px rgba(109, 224, 189, 0); } }
 .dashboard { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.7fr); gap: 18px; }
 #map { min-height: 620px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #122a43; }
@@ -77,6 +80,7 @@ h2 { font-size: 1.45rem; margin: 0; }
 .leaflet-control-zoom a { background: var(--panel) !important; color: white !important; border-color: var(--line) !important; }
 .adhan-travel-marker { width: 42px !important; height: 42px !important; margin-left: -21px !important; margin-top: -21px !important; border-radius: 50%; background: rgba(109, 224, 189, 0.16); border: 2px solid #ffffff; box-shadow: 0 0 0 7px rgba(109, 224, 189, 0.24), 0 0 28px 8px rgba(109, 224, 189, 0.48); animation: adhan-map-pulse 1.25s ease-out infinite; }
 .adhan-travel-marker::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #6de0bd; }
+.adhan-travel-marker span { position: absolute; inset: 12px; border-radius: 50%; }
 .adhan-stop-marker { width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 50%; background: #6de0bd; border: 2px solid #091525; box-shadow: 0 0 12px rgba(109, 224, 189, 0.9); }
 .adhan-map-tooltip { background: #091525 !important; color: #ffffff !important; border: 1px solid rgba(109, 224, 189, 0.5) !important; border-radius: 8px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.28) !important; font-weight: 800; }
 .adhan-map-tooltip::before { border-top-color: #091525 !important; }
