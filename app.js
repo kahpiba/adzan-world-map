@@ -20,6 +20,9 @@ const elements = {
   continuityProgress: document.querySelector("#continuity-progress-bar"),
   continuityToggle: document.querySelector("#continuity-toggle"),
   continuityPulse: document.querySelector("#continuity-pulse"),
+  mapWash: document.querySelector(".map-resonance-wash"),
+  mapLight: document.querySelector(".map-resonance-light"),
+  mapPhaseLabel: document.querySelector("#map-phase-label"),
 };
 
 let marker;
@@ -40,6 +43,7 @@ const continuityStops = [
 
 function startContinuityAnimation() {
   const route = continuityStops.map(({ point }) => point);
+  let previousStopIndex = 0;
   const routeLine = L.polyline(route, { color: "#6de0bd", weight: 4, opacity: 0.78, dashArray: "12 10", pane: "overlayPane" }).addTo(map);
   const stopDots = continuityStops.map(({ point }, index) => {
     const icon = L.divIcon({ className: "adhan-stop-marker", iconSize: [12, 12] });
@@ -83,6 +87,27 @@ function startContinuityAnimation() {
       activeDot.setLatLng([lat, lng]);
       const stop = continuityStops[segment];
       activeDot.setTooltipContent(`${stop.name} · ${stop.phase}`);
+      const stopIndex = segment;
+      if (previousStopIndex !== stopIndex) {
+        previousStopIndex = stopIndex;
+        elements.mapWash.style.background = stop.color;
+        elements.mapWash.style.opacity = "0.22";
+        elements.mapLight.style.setProperty(
+          "--map-light-color",
+          `${stop.color}99`
+        );
+        elements.mapLight.style.opacity = "0.95";
+        elements.mapPhaseLabel.textContent = stop.phase.toUpperCase();
+        elements.mapPhaseLabel.style.color = stop.color;
+        elements.mapPhaseLabel.style.borderColor = stop.color;
+        window.setTimeout(() => {
+          elements.mapWash.style.opacity = "0.1";
+          elements.mapLight.style.opacity = "0.72";
+        }, 1400);
+      }
+      const mapPoint = map.latLngToContainerPoint([lat, lng]);
+      elements.mapLight.style.left = `${mapPoint.x}px`;
+      elements.mapLight.style.top = `${mapPoint.y}px`;
       if (activeColor !== stop.color) {
         activeColor = stop.color;
         activeDot.setIcon(L.divIcon({

@@ -7,7 +7,7 @@
     <title>Adzan Atlas - Peta Waktu Shalat Dunia</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=3" />
+    <link rel="stylesheet" href="styles.css?v=4" />
   </head>
   <body>
     <main class="app-shell">
@@ -85,7 +85,13 @@
       </section>
 
       <section class="dashboard">
-        <div id="map" aria-label="Peta dunia interaktif"></div>
+        <div id="map" aria-label="Peta dunia interaktif">
+          <div class="map-resonance-wash" aria-hidden="true"></div>
+          <div class="map-resonance-light" aria-hidden="true"></div>
+          <div class="map-phase-name" aria-hidden="true">
+            <span id="map-phase-label">SUBUH</span>
+          </div>
+        </div>
         <aside class="prayer-panel">
           <div class="place-heading">
             <div class="location-pin">✦</div>
@@ -107,6 +113,6 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=5"></script>
   </body>
 </html>

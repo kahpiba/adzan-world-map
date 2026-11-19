@@ -13,6 +13,7 @@ Peta dunia interaktif untuk melihat waktu shalat berdasarkan lokasi yang dipilih
 - Animasi estafet lintas zona waktu sebagai model edukasi kontinuitas waktu adzan.
 - Gelombang resonansi berwarna di peta untuk Subuh (biru), Terbit (emas), Dzuhur (oranye),
   Ashar (kuning), Maghrib (merah), dan Isya (ungu).
+- Lapisan cahaya area peta berpindah mengikuti lokasi aktif dan warna peta berubah sesuai fase.
 
 ## Menjalankan lokal
 

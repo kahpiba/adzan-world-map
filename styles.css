@@ -61,7 +61,13 @@ h1 span { color: var(--mint); }
 .prayer-resonance-legend i { width: 8px; height: 8px; border-radius: 50%; background: var(--phase); box-shadow: 0 0 8px var(--phase); }
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(109, 224, 189, 0.65); } 50% { box-shadow: 0 0 0 9px rgba(109, 224, 189, 0); } }
 .dashboard { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.7fr); gap: 18px; }
-#map { min-height: 620px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #122a43; }
+#map { position: relative; min-height: 620px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #122a43; }
+.map-resonance-wash,
+.map-resonance-light,
+.map-phase-name { position: absolute; z-index: 450; pointer-events: none; }
+.map-resonance-wash { inset: 0; background: #4da3ff; opacity: 0.1; mix-blend-mode: screen; transition: background-color 2.2s ease, opacity 2.2s ease; }
+.map-resonance-light { width: 620px; height: 620px; margin: -310px 0 0 -310px; left: 50%; top: 50%; border-radius: 50%; background: radial-gradient(circle, var(--map-light-color, rgba(77,163,255,.42)) 0, rgba(77,163,255,.16) 30%, transparent 68%); filter: blur(12px); opacity: 0.82; transition: left 4.2s linear, top 4.2s linear, background 2.2s ease, opacity 1.4s ease; }
+.map-phase-name { right: 18px; bottom: 18px; padding: 8px 12px; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; background: rgba(9,21,37,.72); backdrop-filter: blur(8px); color: #dcecff; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.16em; box-shadow: 0 8px 24px rgba(0,0,0,.18); transition: color 2s ease, border-color 2s ease; }
 .prayer-panel { background: rgba(16, 35, 59, 0.92); border: 1px solid var(--line); border-radius: 18px; padding: 28px; display: flex; flex-direction: column; min-height: 620px; }
 .place-heading { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
 .location-pin { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 12px; background: rgba(109, 224, 189, 0.14); color: var(--mint); font-size: 1.2rem; }
@@ -85,6 +91,13 @@ h2 { font-size: 1.45rem; margin: 0; }
 .adhan-map-tooltip { background: #091525 !important; color: #ffffff !important; border: 1px solid rgba(109, 224, 189, 0.5) !important; border-radius: 8px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.28) !important; font-weight: 800; }
 .adhan-map-tooltip::before { border-top-color: #091525 !important; }
 @keyframes adhan-map-pulse { 0% { transform: scale(0.92); } 50% { transform: scale(1.08); } 100% { transform: scale(0.92); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .map-resonance-wash,
+  .map-resonance-light,
+  .adhan-travel-marker,
+  .pulse-dot { transition-duration: 0.01ms !important; animation-duration: 8s !important; }
+}
 
 @media (max-width: 900px) {
   .app-shell { width: min(100% - 28px, 720px); padding-top: 28px; }
