@@ -7,7 +7,7 @@
     <title>Adzan Atlas - Peta Waktu Shalat Dunia</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=5" />
+    <link rel="stylesheet" href="styles.css?v=6" />
   </head>
   <body>
     <main class="app-shell">
@@ -101,6 +101,16 @@
         <div id="coverage-result" class="coverage-result" role="status">
           Siap menghitung 20 kota lintas zona waktu.
         </div>
+        <div class="coverage-visual">
+          <div class="coverage-visual-head">
+            <div>
+              <span class="eyebrow">VISUALISASI 24 JAM</span>
+              <strong id="coverage-visual-title">Klik Analisis untuk memuat kota</strong>
+            </div>
+            <span id="coverage-clock" class="coverage-clock">00:00 UTC</span>
+          </div>
+          <div id="coverage-timeline" class="coverage-timeline" aria-label="Timeline waktu adzan per kota"></div>
+        </div>
       </section>
 
       <section class="dashboard">
@@ -132,6 +142,6 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=7"></script>
   </body>
 </html>

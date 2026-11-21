@@ -15,6 +15,7 @@ Peta dunia interaktif untuk melihat waktu shalat berdasarkan lokasi yang dipilih
   Ashar (kuning), Maghrib (merah), dan Isya (ungu).
 - Lapisan cahaya area peta berpindah mengikuti lokasi aktif dan warna peta berubah sesuai fase.
 - Analisis cakupan adzan lintas 20 kota: menghitung 1.440 menit dalam satu hari dan melaporkan celah.
+- Timeline 24 jam per kota, pemutaran waktu UTC, dan titik kota aktif di peta seperti visualisasi event global.
 
 ## Menjalankan lokal
 

@@ -26,11 +26,16 @@ const elements = {
   coverageButton: document.querySelector("#coverage-button"),
   coveragePercent: document.querySelector("#coverage-percent"),
   coverageResult: document.querySelector("#coverage-result"),
+  coverageTimeline: document.querySelector("#coverage-timeline"),
+  coverageVisualTitle: document.querySelector("#coverage-visual-title"),
+  coverageClock: document.querySelector("#coverage-clock"),
 };
 
 let marker;
 let activeRequest = 0;
 let continuityAnimation;
+let coverageMarkers = [];
+let coveragePlayback = null;
 
 const continuityStops = [
   { name: "Makkah, Arab Saudi", phase: "Subuh", prayer: "Subuh", color: "#4da3ff", point: [21.4225, 39.8262] },
@@ -195,11 +200,100 @@ function toUtcMinute(time, offset) {
   return ((localMinute - offset * 60) % 1440 + 1440) % 1440;
 }
 
+const phaseColors = {
+  Fajr: "#4da3ff",
+  Dhuhr: "#ff8c42",
+  Asr: "#f6b94a",
+  Maghrib: "#ef6f61",
+  Isha: "#7c83fd",
+};
+
+function renderCoverageVisual(eventsByCity) {
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(Object.assign(document.createElement("div"), { className: "coverage-city-label" }));
+
+  for (let hour = 0; hour < 24; hour += 1) {
+    const label = document.createElement("div");
+    label.className = "coverage-hour-label";
+    label.textContent = String(hour).padStart(2, "0");
+    fragment.appendChild(label);
+  }
+
+  coverageMarkers.forEach((item) => map.removeLayer(item.marker));
+  coverageMarkers = [];
+
+  for (const cityEvent of eventsByCity) {
+    const cityLabel = document.createElement("div");
+    cityLabel.className = "coverage-city-label";
+    cityLabel.textContent = cityEvent.city.name;
+    fragment.appendChild(cityLabel);
+
+    const eventsByHour = new Map();
+    for (const event of cityEvent.events) {
+      const hour = Math.floor(event.minute / 60);
+      if (!eventsByHour.has(hour)) eventsByHour.set(hour, []);
+      eventsByHour.get(hour).push(event);
+    }
+
+    for (let hour = 0; hour < 24; hour += 1) {
+      const cell = document.createElement("div");
+      cell.className = "coverage-cell";
+      const hourEvents = eventsByHour.get(hour) || [];
+      if (hourEvents.length > 0) {
+        const event = hourEvents[0];
+        cell.style.background = phaseColors[event.name];
+        cell.style.color = phaseColors[event.name];
+        cell.title = `${cityEvent.city.name}: ${hourEvents.map((item) => item.label).join(", ")}`;
+        cell.dataset.minutes = hourEvents.map((item) => item.minute).join(",");
+        cell.dataset.name = hourEvents.map((item) => item.name).join(",");
+      }
+      fragment.appendChild(cell);
+    }
+
+    const marker = L.circleMarker([cityEvent.city.lat, cityEvent.city.lng], {
+      radius: 5,
+      weight: 1,
+      color: "#d9e9f5",
+      fillColor: "#6de0bd",
+      fillOpacity: 0.72,
+    }).addTo(map).bindTooltip(cityEvent.city.name, { direction: "top", className: "adhan-map-tooltip" });
+    coverageMarkers.push({ city: cityEvent.city, events: cityEvent.events, marker });
+  }
+
+  elements.coverageTimeline.replaceChildren(fragment);
+  elements.coverageVisualTitle.textContent = `${eventsByCity.length} kota · zona UTC lintas dunia`;
+
+  if (coveragePlayback) clearInterval(coveragePlayback);
+  let playbackMinute = 0;
+  coveragePlayback = setInterval(() => {
+    playbackMinute = (playbackMinute + 20) % 1440;
+    const hours = Math.floor(playbackMinute / 60);
+    const minutes = playbackMinute % 60;
+    elements.coverageClock.textContent = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")} UTC`;
+
+    document.querySelectorAll(".coverage-cell").forEach((cell) => {
+      const activeMinutes = (cell.dataset.minutes || "").split(",").filter(Boolean).map(Number);
+      cell.classList.toggle("active", activeMinutes.some((minute) => Math.abs(minute - playbackMinute) < 20));
+    });
+
+    coverageMarkers.forEach((item) => {
+      const activeEvents = item.events.filter((event) => Math.abs(event.minute - playbackMinute) < 20);
+      if (activeEvents.length > 0) {
+        const color = phaseColors[activeEvents[0].name];
+        item.marker.setStyle({ radius: 9, weight: 3, color: "#ffffff", fillColor: color, fillOpacity: 1 });
+      } else {
+        item.marker.setStyle({ radius: 5, weight: 1, color: "#d9e9f5", fillColor: "#6de0bd", fillOpacity: 0.72 });
+      }
+    });
+  }, 80);
+}
+
 async function analyzeCoverage() {
   elements.coverageButton.disabled = true;
   elements.coveragePercent.textContent = "Menghitung...";
   elements.coverageResult.textContent = "Mengambil jadwal dari 20 kota...";
   const minuteCoverage = new Uint16Array(1440);
+  const eventsByCity = [];
   let successfulCities = 0;
 
   const results = await Promise.allSettled(coverageCities.map(async (city) => {
@@ -218,11 +312,22 @@ async function analyzeCoverage() {
     if (result.status !== "fulfilled") continue;
     successfulCities += 1;
     const { city, timings } = result.value;
+    const cityEvents = [];
     for (const name of ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]) {
       const minute = toUtcMinute(timings[name], city.offset);
-      if (minute !== null) minuteCoverage[minute] += 1;
+      if (minute !== null) {
+        minuteCoverage[minute] += 1;
+        cityEvents.push({
+          minute,
+          name,
+          label: `${timings[name]} UTC+${city.offset}`,
+        });
+      }
     }
+    eventsByCity.push({ city, events: cityEvents });
   }
+
+  renderCoverageVisual(eventsByCity);
 
   let coveredMinutes = 0;
   let weakestCount = Infinity;
