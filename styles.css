@@ -59,6 +59,15 @@ h1 span { color: var(--mint); }
 .prayer-resonance-legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px 10px; margin-top: 16px; color: var(--muted); font-size: 0.68rem; }
 .prayer-resonance-legend span { display: flex; align-items: center; gap: 6px; }
 .prayer-resonance-legend i { width: 8px; height: 8px; border-radius: 50%; background: var(--phase); box-shadow: 0 0 8px var(--phase); }
+.coverage-card { display: grid; grid-template-columns: minmax(0, 1fr) 150px auto; align-items: center; gap: 18px; margin: 0 0 18px; padding: 22px 28px; border: 1px solid var(--line); border-radius: 18px; background: rgba(9,21,37,.82); }
+.coverage-card h2 { margin: 0; font-size: 1.25rem; }
+.coverage-description { color: var(--muted); margin: 8px 0 0; max-width: 680px; font-size: 0.82rem; line-height: 1.5; }
+.coverage-metric { text-align: center; border-left: 1px solid var(--line); border-right: 1px solid var(--line); padding: 4px 16px; }
+.coverage-metric strong { display: block; color: var(--mint); font-size: 1.35rem; }
+.coverage-metric span { color: var(--muted); font-size: 0.68rem; }
+.coverage-button { border: 1px solid rgba(109,224,189,.4); border-radius: 10px; padding: 12px 14px; background: rgba(109,224,189,.12); color: #c9f8e9; font-weight: 800; }
+.coverage-button:disabled { opacity: .6; cursor: wait; }
+.coverage-result { grid-column: 1 / -1; min-height: 18px; color: var(--muted); font-size: 0.76rem; }
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(109, 224, 189, 0.65); } 50% { box-shadow: 0 0 0 9px rgba(109, 224, 189, 0); } }
 .dashboard { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.7fr); gap: 18px; }
 #map { position: relative; min-height: 620px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #122a43; }
@@ -105,5 +114,7 @@ h2 { font-size: 1.45rem; margin: 0; }
   .date-card { border-left: 0; border-top: 1px solid var(--line); margin-top: 24px; padding: 16px 0 0; }
   .dashboard { grid-template-columns: 1fr; }
   .continuity-card { grid-template-columns: 1fr; gap: 8px; }
+  .coverage-card { grid-template-columns: 1fr; }
+  .coverage-metric { border: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 12px; }
   #map, .prayer-panel { min-height: 520px; }
 }

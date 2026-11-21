@@ -23,6 +23,9 @@ const elements = {
   mapWash: document.querySelector(".map-resonance-wash"),
   mapLight: document.querySelector(".map-resonance-light"),
   mapPhaseLabel: document.querySelector("#map-phase-label"),
+  coverageButton: document.querySelector("#coverage-button"),
+  coveragePercent: document.querySelector("#coverage-percent"),
+  coverageResult: document.querySelector("#coverage-result"),
 };
 
 let marker;
@@ -162,6 +165,101 @@ function getLocalDate() {
   return new Date(now.getTime() - offset).toISOString().slice(0, 10);
 }
 
+const coverageCities = [
+  { name: "Makkah", lat: 21.4225, lng: 39.8262, offset: 3 },
+  { name: "Istanbul", lat: 41.0082, lng: 28.9784, offset: 3 },
+  { name: "Cairo", lat: 30.0444, lng: 31.2357, offset: 2 },
+  { name: "Karachi", lat: 24.8607, lng: 67.0011, offset: 5 },
+  { name: "Dhaka", lat: 23.8103, lng: 90.4125, offset: 6 },
+  { name: "Jakarta", lat: -6.2088, lng: 106.8456, offset: 7 },
+  { name: "Kuala Lumpur", lat: 3.139, lng: 101.6869, offset: 8 },
+  { name: "Singapore", lat: 1.3521, lng: 103.8198, offset: 8 },
+  { name: "Tokyo", lat: 35.6762, lng: 139.6503, offset: 9 },
+  { name: "Sydney", lat: -33.8688, lng: 151.2093, offset: 10 },
+  { name: "London", lat: 51.5072, lng: -0.1276, offset: 0 },
+  { name: "Paris", lat: 48.8566, lng: 2.3522, offset: 1 },
+  { name: "Casablanca", lat: 33.5731, lng: -7.5898, offset: 1 },
+  { name: "Lagos", lat: 6.5244, lng: 3.3792, offset: 1 },
+  { name: "Cape Town", lat: -33.9249, lng: 18.4241, offset: 2 },
+  { name: "New York", lat: 40.7128, lng: -74.006, offset: -5 },
+  { name: "Chicago", lat: 41.8781, lng: -87.6298, offset: -6 },
+  { name: "Los Angeles", lat: 34.0522, lng: -118.2437, offset: -8 },
+  { name: "São Paulo", lat: -23.5505, lng: -46.6333, offset: -3 },
+  { name: "Mexico City", lat: 19.4326, lng: -99.1332, offset: -6 },
+];
+
+function toUtcMinute(time, offset) {
+  if (!time) return null;
+  const [hours, minutes] = time.split(":").map(Number);
+  const localMinute = hours * 60 + minutes;
+  return ((localMinute - offset * 60) % 1440 + 1440) % 1440;
+}
+
+async function analyzeCoverage() {
+  elements.coverageButton.disabled = true;
+  elements.coveragePercent.textContent = "Menghitung...";
+  elements.coverageResult.textContent = "Mengambil jadwal dari 20 kota...";
+  const minuteCoverage = new Uint16Array(1440);
+  let successfulCities = 0;
+
+  const results = await Promise.allSettled(coverageCities.map(async (city) => {
+    const date = getLocalDate();
+    const response = await fetch(
+      `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=${elements.method.value}`
+    );
+    if (!response.ok) throw new Error(city.name);
+    const payload = await response.json();
+    if (payload.code !== 200) throw new Error(city.name);
+    const timings = payload.data.timings;
+    return { city, timings };
+  }));
+
+  for (const result of results) {
+    if (result.status !== "fulfilled") continue;
+    successfulCities += 1;
+    const { city, timings } = result.value;
+    for (const name of ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]) {
+      const minute = toUtcMinute(timings[name], city.offset);
+      if (minute !== null) minuteCoverage[minute] += 1;
+    }
+  }
+
+  let coveredMinutes = 0;
+  let weakestCount = Infinity;
+  let gapStart = null;
+  const gaps = [];
+  for (let minute = 0; minute < 1440; minute += 1) {
+    if (minuteCoverage[minute] > 0) coveredMinutes += 1;
+    if (minuteCoverage[minute] < weakestCount) weakestCount = minuteCoverage[minute];
+    if (minuteCoverage[minute] === 0 && gapStart === null) gapStart = minute;
+    if (minuteCoverage[minute] > 0 && gapStart !== null) {
+      gaps.push([gapStart, minute - 1]);
+      gapStart = null;
+    }
+  }
+  if (gapStart !== null) gaps.push([gapStart, 1439]);
+
+  const percent = ((coveredMinutes / 1440) * 100).toFixed(1);
+  elements.coveragePercent.textContent = `${percent}%`;
+  elements.coveragePercent.style.color = percent === "100.0" ? "#6de0bd" : "#ffd166";
+
+  if (successfulCities === 0) {
+    elements.coverageResult.textContent = "Analisis gagal: data kota tidak dapat diambil.";
+  } else if (gaps.length === 0) {
+    elements.coverageResult.textContent =
+      `${successfulCities} kota berhasil dianalisis. Tidak ditemukan celah menit pada jam UTC hari ini; setiap 1.440 menit memiliki minimal satu waktu adzan.`;
+  } else {
+    const gapText = gaps
+      .slice(0, 3)
+      .map(([start, end]) => `${String(Math.floor(start / 60)).padStart(2, "0")}:${String(start % 60).padStart(2, "0")}–${String(Math.floor(end / 60)).padStart(2, "0")}:${String(end % 60).padStart(2, "0")} UTC`)
+      .join(", ");
+    elements.coverageResult.textContent =
+      `${successfulCities} kota dianalisis. Celah: ${gapText}${gaps.length > 3 ? `; ditambah ${gaps.length - 3} celah lainnya` : ""}.`;
+  }
+  elements.coverageButton.disabled = false;
+  elements.coverageButton.textContent = "Hitung ulang";
+}
+
 const prayerLabels = {
   Fajr: "Subuh",
   Sunrise: "Terbit",
@@ -264,4 +362,5 @@ elements.locateButton.addEventListener("click", () => {
   );
 });
 elements.continuityToggle.addEventListener("click", () => continuityAnimation?.toggle());
+elements.coverageButton.addEventListener("click", analyzeCoverage);
 startContinuityAnimation();

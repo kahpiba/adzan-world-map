@@ -7,7 +7,7 @@
     <title>Adzan Atlas - Peta Waktu Shalat Dunia</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=4" />
+    <link rel="stylesheet" href="styles.css?v=5" />
   </head>
   <body>
     <main class="app-shell">
@@ -84,6 +84,25 @@
         </div>
       </section>
 
+      <section class="coverage-card" aria-labelledby="coverage-title">
+        <div>
+          <p class="eyebrow">ANALISIS CAKUPAN HARIAN</p>
+          <h2 id="coverage-title">Apakah adzan ada setiap menit?</h2>
+          <p class="coverage-description">
+            Menggabungkan waktu Subuh, Dzuhur, Ashar, Maghrib, dan Isya dari kota-kota lintas zona waktu,
+            lalu memeriksa 1.440 menit dalam satu hari.
+          </p>
+        </div>
+        <div class="coverage-metric">
+          <strong id="coverage-percent">Belum dihitung</strong>
+          <span>cakupan menit</span>
+        </div>
+        <button id="coverage-button" class="coverage-button" type="button">Analisis cakupan kota</button>
+        <div id="coverage-result" class="coverage-result" role="status">
+          Siap menghitung 20 kota lintas zona waktu.
+        </div>
+      </section>
+
       <section class="dashboard">
         <div id="map" aria-label="Peta dunia interaktif">
           <div class="map-resonance-wash" aria-hidden="true"></div>
@@ -113,6 +132,6 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>
