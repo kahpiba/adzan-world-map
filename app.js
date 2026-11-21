@@ -35,6 +35,8 @@ const elements = {
   mapLiveTime: document.querySelector("#map-live-time"),
   mapLiveCity: document.querySelector("#map-live-city"),
   mapLivePhase: document.querySelector("#map-live-phase"),
+  fieldEast: document.querySelector(".field-east"),
+  fieldWest: document.querySelector(".field-west"),
 };
 
 let marker;
@@ -59,21 +61,27 @@ const continuityStops = [
 function startContinuityAnimation() {
   const route = continuityStops.map(({ point }) => point);
   let previousStopIndex = 0;
-  const routeLine = L.polyline(route, { color: "#6de0bd", weight: 4, opacity: 0.78, dashArray: "12 10", pane: "overlayPane" }).addTo(map);
-  const stopDots = continuityStops.map(({ point }, index) => {
-    const icon = L.divIcon({ className: "adhan-stop-marker", iconSize: [12, 12] });
-    return L.marker(point, { icon, zIndexOffset: 400 }).addTo(map)
-      .bindTooltip(continuityStops[index].name, { permanent: false, direction: "top", className: "adhan-map-tooltip" });
-  });
-  const travelIcon = L.divIcon({
-    className: "adhan-travel-marker",
-    iconSize: [42, 42],
-    iconAnchor: [21, 21],
-    html: `<span style="background:${continuityStops[0].color};box-shadow:0 0 18px ${continuityStops[0].color}"></span>`,
-  });
-  const activeDot = L.marker(route[0], { icon: travelIcon, zIndexOffset: 1000 })
-    .addTo(map)
-    .bindTooltip(continuityStops[0].name, { permanent: true, offset: [0, -28], direction: "top", className: "adhan-map-tooltip" });
+  const routeLine = L.polyline(route, { color: "#6de0bd", weight: 1, opacity: 0.12, dashArray: "2 18", pane: "overlayPane" }).addTo(map);
+  const stopAreas = continuityStops.map(({ point, color }, index) =>
+    L.circle(point, {
+      radius: 520000,
+      color,
+      weight: 1,
+      opacity: 0.12,
+      fillColor: color,
+      fillOpacity: 0.035,
+      interactive: false,
+    }).addTo(map)
+  );
+  const activeArea = L.circle(route[0], {
+    radius: 820000,
+    color: continuityStops[0].color,
+    weight: 2,
+    opacity: 0.7,
+    fillColor: continuityStops[0].color,
+    fillOpacity: 0.28,
+    interactive: false,
+  }).addTo(map);
   const resonanceRings = [0, 1, 2].map((ringIndex) =>
     L.circle(route[0], {
       radius: 180000 + ringIndex * 350000,
@@ -99,9 +107,9 @@ function startContinuityAnimation() {
       const to = route[(segment + 1) % route.length];
       const lat = from[0] + (to[0] - from[0]) * progress;
       const lng = from[1] + (to[1] - from[1]) * progress;
-      activeDot.setLatLng([lat, lng]);
+      activeArea.setLatLng([lat, lng]);
+      activeArea.setRadius(520000 + progress * 420000);
       const stop = continuityStops[segment];
-      activeDot.setTooltipContent(`${stop.name} · ${stop.phase}`);
       const stopIndex = segment;
       if (previousStopIndex !== stopIndex) {
         previousStopIndex = stopIndex;
@@ -115,6 +123,10 @@ function startContinuityAnimation() {
         elements.mapPhaseLabel.textContent = stop.phase.toUpperCase();
         elements.mapPhaseLabel.style.color = stop.color;
         elements.mapPhaseLabel.style.borderColor = stop.color;
+        elements.fieldEast.style.background =
+          `radial-gradient(ellipse, ${stop.color}99 0%, ${stop.color}22 38%, transparent 72%)`;
+        elements.fieldWest.style.background =
+          `radial-gradient(ellipse, ${stop.color}66 0%, ${stop.color}18 42%, transparent 72%)`;
         window.setTimeout(() => {
           elements.mapWash.style.opacity = "0.1";
           elements.mapLight.style.opacity = "0.72";
@@ -125,12 +137,12 @@ function startContinuityAnimation() {
       elements.mapLight.style.top = `${mapPoint.y}px`;
       if (activeColor !== stop.color) {
         activeColor = stop.color;
-        activeDot.setIcon(L.divIcon({
-          className: "adhan-travel-marker",
-          iconSize: [42, 42],
-          iconAnchor: [21, 21],
-          html: `<span style="background:${stop.color};box-shadow:0 0 18px ${stop.color}"></span>`,
-        }));
+        activeArea.setStyle({
+          color: stop.color,
+          fillColor: stop.color,
+          opacity: 0.72,
+          fillOpacity: 0.32,
+        });
         elements.continuityPulse.style.background = stop.color;
         elements.continuityPulse.style.boxShadow = `0 0 14px ${stop.color}`;
       }
@@ -166,8 +178,8 @@ function startContinuityAnimation() {
       elements.continuityToggle.setAttribute("aria-pressed", String(!paused));
     },
     routeLine,
-    stopDots,
-    activeDot,
+    stopAreas,
+    activeArea,
   };
 }
 
@@ -257,14 +269,16 @@ function renderCoverageVisual(eventsByCity) {
       fragment.appendChild(cell);
     }
 
-    const marker = L.circleMarker([cityEvent.city.lat, cityEvent.city.lng], {
-      radius: 5,
+    const area = L.circle([cityEvent.city.lat, cityEvent.city.lng], {
+      radius: 620000,
       weight: 1,
-      color: "#d9e9f5",
+      color: "#b5d9ef",
+      opacity: 0.14,
       fillColor: "#6de0bd",
-      fillOpacity: 0.72,
+      fillOpacity: 0.055,
+      interactive: true,
     }).addTo(map).bindTooltip(cityEvent.city.name, { direction: "top", className: "adhan-map-tooltip" });
-    coverageMarkers.push({ city: cityEvent.city, events: cityEvent.events, marker });
+    coverageMarkers.push({ city: cityEvent.city, events: cityEvent.events, marker: area });
   }
 
   elements.coverageTimeline.replaceChildren(fragment);
@@ -291,20 +305,26 @@ function renderCoverageVisual(eventsByCity) {
       const activeEvents = item.events.filter((event) => Math.abs(event.minute - playbackMinute) < 20);
       if (activeEvents.length > 0) {
         const color = phaseColors[activeEvents[0].name];
-        item.marker.setStyle({ radius: 9, weight: 3, color: "#ffffff", fillColor: color, fillOpacity: 1 });
+        item.marker.setRadius(980000);
+        item.marker.setStyle({ weight: 2, color, opacity: 0.82, fillColor: color, fillOpacity: 0.34 });
         const mapPoint = map.latLngToContainerPoint([item.city.lat, item.city.lng]);
         elements.mapLight.style.left = `${mapPoint.x}px`;
         elements.mapLight.style.top = `${mapPoint.y}px`;
         elements.mapLight.style.setProperty("--map-light-color", `${color}bb`);
         elements.mapWash.style.background = color;
         elements.mapWash.style.opacity = "0.18";
+        elements.fieldEast.style.background =
+          `radial-gradient(ellipse, ${color}99 0%, ${color}22 38%, transparent 72%)`;
+        elements.fieldWest.style.background =
+          `radial-gradient(ellipse, ${color}66 0%, ${color}18 42%, transparent 72%)`;
         elements.mapLiveEvent.classList.add("visible");
         elements.mapLiveEvent.style.borderLeftColor = color;
         elements.mapLiveTime.textContent = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")} UTC`;
         elements.mapLiveCity.textContent = item.city.name;
         elements.mapLivePhase.textContent = `${prayerLabels[activeEvents[0].name]} · adzan aktif`;
       } else {
-        item.marker.setStyle({ radius: 5, weight: 1, color: "#d9e9f5", fillColor: "#6de0bd", fillOpacity: 0.72 });
+        item.marker.setRadius(620000);
+        item.marker.setStyle({ weight: 1, color: "#b5d9ef", opacity: 0.14, fillColor: "#6de0bd", fillOpacity: 0.055 });
       }
     });
   };

@@ -83,6 +83,21 @@ h1 span { color: var(--mint); }
 @keyframes pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(109, 224, 189, 0.65); } 50% { box-shadow: 0 0 0 9px rgba(109, 224, 189, 0); } }
 .dashboard { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.7fr); gap: 18px; }
 #map { position: relative; min-height: 620px; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #122a43; }
+.map-color-fields { position: absolute; inset: -20%; z-index: 449; pointer-events: none; overflow: hidden; opacity: .72; filter: blur(22px) saturate(125%); mix-blend-mode: screen; }
+.map-color-field { position: absolute; width: 58%; aspect-ratio: 1.65; border-radius: 48%; transform-origin: center; transition: background 2.8s cubic-bezier(.22,.61,.36,1), transform 5s cubic-bezier(.22,.61,.36,1), opacity 1.8s ease; }
+.field-east { right: -18%; top: 8%; background: radial-gradient(ellipse, rgba(77,163,255,.62) 0%, rgba(77,163,255,.16) 38%, transparent 72%); transform: rotate(-12deg); animation: area-drift-east 16s ease-in-out infinite alternate; }
+.field-west { left: -20%; bottom: -8%; background: radial-gradient(ellipse, rgba(255,140,66,.48) 0%, rgba(255,140,66,.13) 42%, transparent 72%); transform: rotate(10deg); animation: area-drift-west 18s ease-in-out infinite alternate; }
+.map-resonance-wash { background:
+  radial-gradient(circle at 68% 38%, rgba(77,163,255,.28), transparent 24%),
+  radial-gradient(circle at 32% 68%, rgba(255,140,66,.18), transparent 28%),
+  linear-gradient(120deg, transparent 12%, rgba(255,255,255,.06) 50%, transparent 88%);
+  background-size: 100% 100%, 100% 100%, 220% 100%;
+  opacity: .68;
+  animation: area-wash-shift 14s ease-in-out infinite alternate;
+}
+@keyframes area-drift-east { to { transform: translate(-5%, 7%) rotate(9deg) scale(1.08); } }
+@keyframes area-drift-west { to { transform: translate(8%, -6%) rotate(-8deg) scale(1.11); } }
+@keyframes area-wash-shift { to { background-position: 12% 0, -10% 8%, -20% 0; } }
 .map-resonance-wash,
 .map-resonance-light,
 .map-phase-name { position: absolute; z-index: 450; pointer-events: none; }
@@ -117,7 +132,6 @@ h2 { font-size: 1.45rem; margin: 0; }
 .adhan-travel-marker { width: 42px !important; height: 42px !important; margin-left: -21px !important; margin-top: -21px !important; border-radius: 50%; background: rgba(109, 224, 189, 0.16); border: 2px solid #ffffff; box-shadow: 0 0 0 7px rgba(109, 224, 189, 0.24), 0 0 28px 8px rgba(109, 224, 189, 0.48); animation: adhan-map-pulse 1.25s ease-out infinite; }
 .adhan-travel-marker::after { content: ""; position: absolute; inset: 12px; border-radius: 50%; background: #6de0bd; }
 .adhan-travel-marker span { position: absolute; inset: 12px; border-radius: 50%; }
-.adhan-stop-marker { width: 12px; height: 12px; margin-left: -6px; margin-top: -6px; border-radius: 50%; background: #6de0bd; border: 2px solid #091525; box-shadow: 0 0 12px rgba(109, 224, 189, 0.9); }
 .adhan-map-tooltip { background: #091525 !important; color: #ffffff !important; border: 1px solid rgba(109, 224, 189, 0.5) !important; border-radius: 8px !important; box-shadow: 0 8px 24px rgba(0,0,0,0.28) !important; font-weight: 800; }
 .adhan-map-tooltip::before { border-top-color: #091525 !important; }
 @keyframes adhan-map-pulse { 0% { transform: scale(0.92); } 50% { transform: scale(1.08); } 100% { transform: scale(0.92); } }
