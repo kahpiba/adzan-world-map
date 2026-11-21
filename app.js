@@ -29,6 +29,12 @@ const elements = {
   coverageTimeline: document.querySelector("#coverage-timeline"),
   coverageVisualTitle: document.querySelector("#coverage-visual-title"),
   coverageClock: document.querySelector("#coverage-clock"),
+  cinematicToggle: document.querySelector("#cinematic-toggle"),
+  coverageSpeed: document.querySelector("#coverage-speed"),
+  mapLiveEvent: document.querySelector("#map-live-event"),
+  mapLiveTime: document.querySelector("#map-live-time"),
+  mapLiveCity: document.querySelector("#map-live-city"),
+  mapLivePhase: document.querySelector("#map-live-phase"),
 };
 
 let marker;
@@ -36,6 +42,7 @@ let activeRequest = 0;
 let continuityAnimation;
 let coverageMarkers = [];
 let coveragePlayback = null;
+let coveragePlaybackFrame = null;
 
 const continuityStops = [
   { name: "Makkah, Arab Saudi", phase: "Subuh", prayer: "Subuh", color: "#4da3ff", point: [21.4225, 39.8262] },
@@ -265,11 +272,15 @@ function renderCoverageVisual(eventsByCity) {
 
   if (coveragePlayback) clearInterval(coveragePlayback);
   let playbackMinute = 0;
-  coveragePlayback = setInterval(() => {
+  const playCoverageFrame = () => {
     playbackMinute = (playbackMinute + 20) % 1440;
     const hours = Math.floor(playbackMinute / 60);
     const minutes = playbackMinute % 60;
     elements.coverageClock.textContent = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")} UTC`;
+    const timelineWidth = elements.coverageTimeline.clientWidth;
+    const firstColumn = window.innerWidth < 900 ? 88 : 118;
+    const cursorPosition = firstColumn + ((timelineWidth - firstColumn) * playbackMinute / 1440);
+    elements.coverageTimeline.style.setProperty("--coverage-cursor", `${cursorPosition}px`);
 
     document.querySelectorAll(".coverage-cell").forEach((cell) => {
       const activeMinutes = (cell.dataset.minutes || "").split(",").filter(Boolean).map(Number);
@@ -281,11 +292,24 @@ function renderCoverageVisual(eventsByCity) {
       if (activeEvents.length > 0) {
         const color = phaseColors[activeEvents[0].name];
         item.marker.setStyle({ radius: 9, weight: 3, color: "#ffffff", fillColor: color, fillOpacity: 1 });
+        const mapPoint = map.latLngToContainerPoint([item.city.lat, item.city.lng]);
+        elements.mapLight.style.left = `${mapPoint.x}px`;
+        elements.mapLight.style.top = `${mapPoint.y}px`;
+        elements.mapLight.style.setProperty("--map-light-color", `${color}bb`);
+        elements.mapWash.style.background = color;
+        elements.mapWash.style.opacity = "0.18";
+        elements.mapLiveEvent.classList.add("visible");
+        elements.mapLiveEvent.style.borderLeftColor = color;
+        elements.mapLiveTime.textContent = `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")} UTC`;
+        elements.mapLiveCity.textContent = item.city.name;
+        elements.mapLivePhase.textContent = `${prayerLabels[activeEvents[0].name]} · adzan aktif`;
       } else {
         item.marker.setStyle({ radius: 5, weight: 1, color: "#d9e9f5", fillColor: "#6de0bd", fillOpacity: 0.72 });
       }
     });
-  }, 80);
+  };
+  coveragePlaybackFrame = playCoverageFrame;
+  coveragePlayback = setInterval(coveragePlaybackFrame, Number(elements.coverageSpeed.value));
 }
 
 async function analyzeCoverage() {
@@ -468,4 +492,18 @@ elements.locateButton.addEventListener("click", () => {
 });
 elements.continuityToggle.addEventListener("click", () => continuityAnimation?.toggle());
 elements.coverageButton.addEventListener("click", analyzeCoverage);
+elements.coverageSpeed.addEventListener("change", () => {
+  if (!coveragePlaybackFrame) return;
+  clearInterval(coveragePlayback);
+  coveragePlayback = setInterval(coveragePlaybackFrame, Number(elements.coverageSpeed.value));
+});
+elements.cinematicToggle.addEventListener("click", () => {
+  const active = elements.cinematicToggle.getAttribute("aria-pressed") !== "true";
+  elements.cinematicToggle.setAttribute("aria-pressed", String(active));
+  elements.cinematicToggle.textContent = active ? "✦ Keluar sinematik" : "✦ Mode sinematik";
+  document.querySelector(".coverage-card").classList.toggle("cinematic", active);
+  if (active) {
+    document.querySelector(".coverage-card").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+});
 startContinuityAnimation();

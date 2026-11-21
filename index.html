@@ -7,7 +7,7 @@
     <title>Adzan Atlas - Peta Waktu Shalat Dunia</title>
     <link rel="preconnect" href="https://unpkg.com" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=6" />
+    <link rel="stylesheet" href="styles.css?v=7" />
   </head>
   <body>
     <main class="app-shell">
@@ -109,6 +109,17 @@
             </div>
             <span id="coverage-clock" class="coverage-clock">00:00 UTC</span>
           </div>
+          <div class="coverage-controls">
+            <button id="cinematic-toggle" class="secondary-button" type="button" aria-pressed="false">✦ Mode sinematik</button>
+            <label>
+              Kecepatan
+              <select id="coverage-speed">
+                <option value="160">Lambat</option>
+                <option value="80" selected>Nyata</option>
+                <option value="35">Cepat</option>
+              </select>
+            </label>
+          </div>
           <div id="coverage-timeline" class="coverage-timeline" aria-label="Timeline waktu adzan per kota"></div>
         </div>
       </section>
@@ -119,6 +130,11 @@
           <div class="map-resonance-light" aria-hidden="true"></div>
           <div class="map-phase-name" aria-hidden="true">
             <span id="map-phase-label">SUBUH</span>
+          </div>
+          <div id="map-live-event" class="map-live-event" aria-live="polite">
+            <span id="map-live-time">24 JAM UTC</span>
+            <strong id="map-live-city">Menunggu analisis</strong>
+            <small id="map-live-phase">Mulai pemutaran untuk melihat kejadian</small>
           </div>
         </div>
         <aside class="prayer-panel">
@@ -142,6 +158,6 @@
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=7"></script>
+    <script src="app.js?v=8"></script>
   </body>
 </html>
