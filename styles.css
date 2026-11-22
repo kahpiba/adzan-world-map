@@ -81,7 +81,7 @@ h1 span { color: var(--phase-glow); }
 .phase-marker span { color: #91a4b8; font-size: .58rem; letter-spacing: .12em; }
 .phase-marker strong { color: var(--phase-glow); font-size: .72rem; letter-spacing: .12em; }
 
-.coverage-timeline { display: grid; grid-template-columns: 112px repeat(24, minmax(10px, 1fr)); gap: 3px; max-height: 280px; overflow: auto; padding: 10px 20px 18px; border-top: 1px solid rgba(255,255,255,.07); }
+.coverage-timeline { display: grid; grid-template-columns: 112px repeat(24, minmax(10px, 1fr)); gap: 3px; max-height: 420px; overflow: auto; padding: 10px 20px 18px; border-top: 1px solid rgba(255,255,255,.07); }
 .coverage-timeline::before { content: ""; grid-column: 1 / -1; height: 1px; background: linear-gradient(90deg, transparent, var(--phase-glow), transparent); opacity: .6; }
 .coverage-timeline .hour-label { color: #758da3; font-size: .55rem; text-align: center; }
 .coverage-timeline .city-label { align-self: center; color: #adbed0; font-size: .62rem; white-space: nowrap; }
