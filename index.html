@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#081525" />
     <title>Adzan Atlas — Peta Waktu Shalat Dunia</title>
     <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=13" />
+    <link rel="stylesheet" href="styles.css?v=14" />
   </head>
   <body>
     <main class="app-shell">
@@ -38,7 +38,17 @@
             <option value="5">Egyptian Authority</option>
           </select>
         </label>
+        <label class="method-select">
+          <span>Lintang tinggi</span>
+          <select id="high-latitude-method">
+            <option value="0">Otomatis</option>
+            <option value="1">Middle of the night</option>
+            <option value="2">One-seventh of the night</option>
+            <option value="3">Angle-based</option>
+          </select>
+        </label>
       </section>
+      <div id="location-suggestions" class="location-suggestions" role="listbox" aria-label="Saran lokasi"></div>
 
       <div id="status" class="status" role="status">Klik peta atau cari lokasi untuk memulai.</div>
 
@@ -70,6 +80,11 @@
             <span>menit tercakup</span>
           </div>
           <p id="coverage-result" role="status">Siap menghitung adzan pada 1.440 menit UTC.</p>
+        </div>
+        <div class="fiqh-note">
+          <span><strong>Dasar:</strong> Al-Qur'an 17:78, 20:130; Sunnah terkait awal/akhir waktu shalat; ijma ulama bahwa shalat lima waktu tetap wajib.</span>
+          <a href="https://sunnah.com/search?q=fajr" target="_blank" rel="noreferrer">Referensi Sunnah</a>
+          <a href="https://api.aladhan.com/" target="_blank" rel="noreferrer">Metode astronomi AlAdhan</a>
         </div>
 
         <div class="world-stage">
@@ -115,6 +130,6 @@
     </main>
 
     <script src="vendor/leaflet/leaflet.js"></script>
-    <script src="app.js?v=13"></script>
+    <script src="app.js?v=14"></script>
   </body>
 </html>

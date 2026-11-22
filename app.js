@@ -14,6 +14,8 @@ const elements = {
   searchButton: $("#search-button"),
   locateButton: $("#locate-button"),
   method: $("#calculation-method"),
+  highLatitudeMethod: $("#high-latitude-method"),
+  suggestions: $("#location-suggestions"),
   status: $("#status"),
   locationName: $("#selected-location"),
   coordinates: $("#coordinates"),
@@ -195,6 +197,23 @@ const uniqueCoverageCities = Array.from(
   new Map(coverageCities.map((city) => [city.name, city])).values()
 );
 coverageCities.splice(0, coverageCities.length, ...uniqueCoverageCities);
+coverageCities.push(
+  { name: "Longyearbyen", lat: 78.2232, lng: 15.6469, offset: 1 },
+  { name: "Qaanaaq", lat: 77.4676, lng: -69.2317, offset: -2 },
+  { name: "Tromsø", lat: 69.6492, lng: 18.9553, offset: 1 },
+  { name: "Barrow (Utqiagvik)", lat: 71.2906, lng: -156.7887, offset: -9 },
+  { name: "Alert, Nunavut", lat: 82.5018, lng: -62.3481, offset: -4 },
+  { name: "Reykjavik", lat: 64.1466, lng: -21.9426, offset: 0 },
+  { name: "McMurdo Station", lat: -77.8419, lng: 166.6863, offset: 12 },
+  { name: "Scott Base", lat: -77.849, lng: 166.768, offset: 12 },
+  { name: "Rothera Research Station", lat: -67.5687, lng: -68.1258, offset: -3 },
+  { name: "Concordia Station", lat: -75.0998, lng: 123.3322, offset: 6 },
+  { name: "Amundsen-Scott South Pole", lat: -90, lng: 0, offset: 0 }
+);
+const polarCoverageNames = new Set([
+  "Longyearbyen","Qaanaaq","Tromsø","Barrow (Utqiagvik)","Alert, Nunavut","Reykjavik",
+  "McMurdo Station","Scott Base","Rothera Research Station","Concordia Station","Amundsen-Scott South Pole"
+]);
 
 let selectedMarker = null;
 let activeRequest = 0;
@@ -208,7 +227,8 @@ const coverageCacheKey = "adzan-atlas-coverage-v1";
 function getCoverageCache(city, date, method) {
   try {
     const cache = JSON.parse(localStorage.getItem(coverageCacheKey) || "{}");
-    return cache[`${date}-${method}-${city.lat}-${city.lng}`];
+    const highLat = Math.abs(city.lat) >= 55 ? "-angle3" : "";
+    return cache[`${date}-${method}${highLat}-${city.lat}-${city.lng}`];
   } catch {
     return null;
   }
@@ -217,7 +237,8 @@ function getCoverageCache(city, date, method) {
 function setCoverageCache(city, date, method, timings) {
   try {
     const cache = JSON.parse(localStorage.getItem(coverageCacheKey) || "{}");
-    cache[`${date}-${method}-${city.lat}-${city.lng}`] = timings;
+    const highLat = Math.abs(city.lat) >= 55 ? "-angle3" : "";
+    cache[`${date}-${method}${highLat}-${city.lat}-${city.lng}`] = timings;
     localStorage.setItem(coverageCacheKey, JSON.stringify(cache));
   } catch {
     // Cache is optional; animation still works without it.
@@ -296,8 +317,12 @@ async function loadPrayerTimes(lat, lng, label = "Lokasi terpilih") {
   map.flyTo([lat, lng], Math.max(map.getZoom(), 5), { duration: 0.8 });
 
   try {
+    const latitudeAdjustment =
+      elements.highLatitudeMethod.value === "0"
+        ? (Math.abs(lat) >= 55 ? "&latitudeAdjustmentMethod=3" : "")
+        : `&latitudeAdjustmentMethod=${elements.highLatitudeMethod.value}`;
     const response = await fetch(
-      `https://api.aladhan.com/v1/timings/${localDate()}?latitude=${lat}&longitude=${lng}&method=${elements.method.value}`
+      `https://api.aladhan.com/v1/timings/${localDate()}?latitude=${lat}&longitude=${lng}&method=${elements.method.value}${latitudeAdjustment}`
     );
     if (!response.ok) throw new Error("API unavailable");
     const payload = await response.json();
@@ -319,17 +344,54 @@ async function loadPrayerTimes(lat, lng, label = "Lokasi terpilih") {
   }
 }
 
+async function showLocationSuggestions() {
+  const query = elements.search.value.trim();
+  if (query.length < 2) {
+    elements.suggestions.classList.remove("visible");
+    elements.suggestions.replaceChildren();
+    return;
+  }
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&q=${encodeURIComponent(query)}`
+    );
+    if (!response.ok) return;
+    const results = await response.json();
+    elements.suggestions.replaceChildren();
+    for (const place of results) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "location-suggestion";
+      button.textContent = place.display_name;
+      button.addEventListener("click", () => {
+        elements.search.value = place.display_name;
+        elements.suggestions.classList.remove("visible");
+        loadPrayerTimes(
+          Number(place.lat),
+          Number(place.lon),
+          place.display_name.split(",").slice(0, 2).join(",")
+        );
+      });
+      elements.suggestions.appendChild(button);
+    }
+    elements.suggestions.classList.toggle("visible", results.length > 0);
+  } catch {
+    elements.suggestions.classList.remove("visible");
+  }
+}
+
 async function searchLocation() {
   const query = elements.search.value.trim();
   if (!query) return;
   setStatus("Mencari lokasi...");
   try {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=${encodeURIComponent(query)}`
+      `https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=8&q=${encodeURIComponent(query)}`
     );
     const results = await response.json();
     if (!results.length) throw new Error("Not found");
-    const place = results[0];
+    const place = results[0].lat != null ? results[0] : null;
+    if (!place) throw new Error("Not found");
     const label = place.display_name.split(",").slice(0, 2).join(",");
     loadPrayerTimes(Number(place.lat), Number(place.lon), label);
   } catch {
@@ -426,8 +488,11 @@ async function analyzeCoverage() {
     const batchResults = await Promise.allSettled(batch.map(async (city) => {
       const cached = getCoverageCache(city, date, method);
       if (cached) return { city, timings: cached };
+      const latitudeAdjustment = Math.abs(city.lat) >= 55
+        ? "&latitudeAdjustmentMethod=3"
+        : "";
       const response = await fetch(
-        `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=${method}`
+        `https://api.aladhan.com/v1/timings/${date}?latitude=${city.lat}&longitude=${city.lng}&method=${method}${latitudeAdjustment}`
       );
       if (!response.ok) throw new Error(city.name);
       const payload = await response.json();
@@ -505,6 +570,11 @@ async function analyzeCoverage() {
 
 map.on("click", (event) => loadPrayerTimes(event.latlng.lat, event.latlng.lng));
 elements.searchButton.addEventListener("click", searchLocation);
+let suggestionTimer;
+elements.search.addEventListener("input", () => {
+  clearTimeout(suggestionTimer);
+  suggestionTimer = setTimeout(showLocationSuggestions, 350);
+});
 elements.search.addEventListener("keydown", (event) => {
   if (event.key === "Enter") searchLocation();
 });

@@ -39,6 +39,12 @@ h1 span { color: var(--phase-glow); }
 .secondary-button, .icon-button { border: 1px solid rgba(255,255,255,.12); border-radius: 10px; padding: 11px 14px; background: #14253a; color: #eef7ff; font-weight: 750; }
 .method-select { display: flex; align-items: center; gap: 8px; color: #91a4b8; font-size: .78rem; }
 .method-select select, .speed-control select { border: 1px solid rgba(255,255,255,.12); border-radius: 9px; padding: 10px; background: #14253a; color: white; }
+.location-suggestions { position: relative; z-index: 900; display: none; width: min(620px, calc(100% - 220px)); margin: -4px 0 10px; border: 1px solid rgba(255,255,255,.12); border-radius: 12px; background: #10233a; box-shadow: 0 14px 36px rgba(0,0,0,.28); overflow: hidden; }
+.location-suggestions.visible { display: block; }
+.location-suggestion { width: 100%; border: 0; border-bottom: 1px solid rgba(255,255,255,.06); padding: 10px 13px; background: transparent; color: #dfeafa; text-align: left; }
+.location-suggestion:hover { background: rgba(109,224,189,.09); }
+.fiqh-note { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px 16px; color: #91a4b8; font-size: .68rem; line-height: 1.5; }
+.fiqh-note a { color: var(--phase-glow); }
 .status { min-height: 20px; margin: 8px 0 10px; color: #91a4b8; font-size: .78rem; }
 .status.error { color: #ff9d9d; }
 

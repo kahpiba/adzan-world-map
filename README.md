@@ -16,6 +16,8 @@ Peta dunia interaktif untuk melihat waktu shalat berdasarkan lokasi yang dipilih
 - Lapisan cahaya area peta berpindah mengikuti lokasi aktif dan warna peta berubah sesuai fase.
 - Analisis cakupan adzan lintas 381 kota unik: menghitung 1.440 menit dalam satu hari dan melaporkan celah.
 - Tidak menggunakan data populasi Muslim; seluruh kota dihitung berdasarkan koordinat dan metode waktu shalat.
+- Pencarian kota memakai Nominatim dan dapat menemukan kota di luar daftar bawaan, termasuk Casablanca.
+- Wilayah lintang tinggi dan kutub menggunakan metode penyesuaian malam yang dapat dipilih; hasil harus dikonfirmasi lembaga fikih setempat.
 - Timeline 24 jam per kota, pemutaran waktu UTC, dan titik kota aktif di peta seperti visualisasi event global.
 - Mode sinematik, kecepatan pemutaran, panel kejadian aktif, dan efek cahaya sinematik di peta.
 - Visual utama berupa kawasan berwarna lembut; gelombang berubah halus tanpa ketergantungan pada titik/node.
