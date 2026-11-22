@@ -294,6 +294,25 @@ async function analyzeCoverage() {
     eventsByCity.push({ ...city, events });
   }
 
+  if (!eventsByCity.length) {
+    for (const city of coverageCities) {
+      const fallbackTimes = {
+        Fajr: "05:20",
+        Dhuhr: "12:10",
+        Asr: "15:35",
+        Maghrib: "18:20",
+        Isha: "20:05",
+      };
+      const events = [];
+      for (const [phaseName, time] of Object.entries(fallbackTimes)) {
+        const minute = utcMinute(time, city.offset);
+        minuteCoverage[minute] += 1;
+        events.push({ minute, phase: phaseName });
+      }
+      eventsByCity.push({ ...city, events });
+    }
+  }
+
   let covered = 0;
   let gapStart = null;
   const gaps = [];
@@ -310,9 +329,12 @@ async function analyzeCoverage() {
   const percent = ((covered / 1440) * 100).toFixed(1);
   elements.coveragePercent.textContent = `${percent}%`;
   elements.coveragePercent.style.color = percent === "100.0" ? "#6de0bd" : "#ffd166";
-  elements.coverageResult.textContent = gaps.length
-    ? `${eventsByCity.length} wilayah dianalisis. ${gaps.length} celah waktu ditemukan.`
-    : `${eventsByCity.length} wilayah dianalisis. Tidak ada celah pada seluruh 1.440 menit UTC.`;
+  const allFulfilled = results.some((result) => result.status === "fulfilled");
+  elements.coverageResult.textContent = allFulfilled
+    ? (gaps.length
+      ? `${eventsByCity.length} wilayah dianalisis. ${gaps.length} celah waktu ditemukan.`
+      : `${eventsByCity.length} wilayah dianalisis. Tidak ada celah pada seluruh 1.440 menit UTC.`)
+    : `${eventsByCity.length} wilayah menggunakan estimasi offline karena API tidak dapat dihubungi.`;
   renderTimeline(eventsByCity);
   startCoveragePlayback(eventsByCity);
   coverageEvents = eventsByCity;
