@@ -222,6 +222,7 @@ let coveragePlaybackId = null;
 let coverageMinute = 0;
 let cinemaPaused = false;
 let mapAreaPulse = null;
+let coverageAreas = [];
 const coverageCacheKey = "adzan-atlas-coverage-v1";
 
 function getCoverageCache(city, date, method) {
@@ -297,14 +298,40 @@ function showMapEvent(lat, lng, name, phaseName) {
   setMapPhase(phaseName, { place: `${name} · ${prayerLabels[phaseName]}` });
 }
 
+function renderCoverageAreas(eventsByCity) {
+  coverageAreas.forEach((area) => area.remove());
+  coverageAreas = eventsByCity.map((city) =>
+    L.circle([city.lat, city.lng], {
+      radius: 300000,
+      weight: 0,
+      fillColor: phases.Fajr.color,
+      fillOpacity: 0.035,
+      interactive: false,
+    }).addTo(map)
+  );
+}
+
 function formatClock(minutes) {
   return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")} UTC`;
+}
+
+function addCoverageCity(name, lat, lng) {
+  const normalizedName = name.split(",")[0].trim();
+  if (coverageCities.some((city) => city.name === normalizedName)) return;
+  coverageCities.push({
+    name: normalizedName,
+    lat,
+    lng,
+    offset: Math.max(-12, Math.min(14, Math.round(lng / 15))),
+  });
+  elements.coverageButton.textContent = `Analisis ${coverageCities.length} wilayah`;
 }
 
 async function loadPrayerTimes(lat, lng, label = "Lokasi terpilih") {
   const requestId = ++activeRequest;
   elements.locationName.textContent = label;
   elements.coordinates.textContent = `${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+  addCoverageCity(label, lat, lng);
   setStatus("Mengambil jadwal waktu shalat...");
   if (selectedMarker) selectedMarker.remove();
   selectedMarker = L.circleMarker([lat, lng], {
@@ -366,6 +393,7 @@ async function showLocationSuggestions() {
       button.addEventListener("click", () => {
         elements.search.value = place.display_name;
         elements.suggestions.classList.remove("visible");
+        addCoverageCity(place.display_name, Number(place.lat), Number(place.lon));
         loadPrayerTimes(
           Number(place.lat),
           Number(place.lon),
@@ -393,6 +421,7 @@ async function searchLocation() {
     const place = results[0].lat != null ? results[0] : null;
     if (!place) throw new Error("Not found");
     const label = place.display_name.split(",").slice(0, 2).join(",");
+    addCoverageCity(label, Number(place.lat), Number(place.lon));
     loadPrayerTimes(Number(place.lat), Number(place.lon), label);
   } catch {
     setStatus("Lokasi tidak ditemukan.", true);
@@ -459,6 +488,17 @@ function startCoveragePlayback(eventsByCity) {
         .filter((event) => Math.abs(event.minute - coverageMinute) < 24)
         .map((event) => ({ ...event, city: city.name, lat: city.lat, lng: city.lng }))
     );
+    const activeCityNames = new Set(activeEvents.map((event) => event.city));
+    coverageAreas.forEach((area, index) => {
+      const city = eventsByCity[index];
+      const active = activeCityNames.has(city.name);
+      const event = activeEvents.find((item) => item.city === city.name);
+      area.setRadius(active ? 520000 : 300000);
+      area.setStyle({
+        fillColor: event ? phases[event.phase].color : phases.Fajr.color,
+        fillOpacity: active ? 0.16 : 0.035,
+      });
+    });
     if (activeEvents.length) {
       const event = activeEvents[0];
       showMapEvent(event.lat, event.lng, event.city, event.phase);
@@ -562,6 +602,7 @@ async function analyzeCoverage() {
       : `${eventsByCity.length} wilayah dianalisis. Tidak ada celah pada seluruh 1.440 menit UTC.`)
     : `${eventsByCity.length} wilayah menggunakan estimasi offline karena API tidak dapat dihubungi.`;
   renderTimeline(eventsByCity);
+  renderCoverageAreas(eventsByCity);
   startCoveragePlayback(eventsByCity);
   coverageEvents = eventsByCity;
   elements.coverageButton.disabled = false;
