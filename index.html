@@ -3,28 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0b172a" />
-    <title>Adzan Atlas - Peta Waktu Shalat Dunia</title>
-    <link rel="preconnect" href="https://unpkg.com" />
+    <meta name="theme-color" content="#081525" />
+    <title>Adzan Atlas — Peta Waktu Shalat Dunia</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="styles.css?v=8" />
+    <link rel="stylesheet" href="styles.css?v=11" />
   </head>
   <body>
     <main class="app-shell">
-      <section class="hero">
+      <header class="hero">
         <div>
-          <p class="eyebrow">ADZAN ATLAS</p>
-          <h1>Waktu shalat dunia, <span>di satu peta.</span></h1>
-          <p class="hero-copy">
-            Pilih lokasi mana pun untuk melihat jadwal adzan hari ini berdasarkan koordinat dan metode
-            perhitungan yang dipilih.
-          </p>
+          <p class="eyebrow">ADZAN ATLAS / GLOBAL RHYTHM</p>
+          <h1>Waktu shalat <span>mengalir bersama dunia.</span></h1>
         </div>
         <div class="date-card">
-          <span id="hijri-date">Memuat tanggal...</span>
+          <span id="hijri-date">Memuat kalender Hijriah</span>
           <strong id="gregorian-date">—</strong>
         </div>
-      </section>
+      </header>
 
       <section class="controls" aria-label="Kontrol lokasi">
         <label class="search-box">
@@ -32,7 +27,7 @@
           <input id="location-search" type="search" placeholder="Cari kota atau negara..." autocomplete="off" />
           <button id="search-button" type="button">Cari</button>
         </label>
-        <button id="locate-button" class="secondary-button" type="button">◎ Gunakan lokasi saya</button>
+        <button id="locate-button" class="secondary-button" type="button">◎ Lokasi saya</button>
         <label class="method-select">
           <span>Metode</span>
           <select id="calculation-method">
@@ -40,128 +35,85 @@
             <option value="2">ISNA</option>
             <option value="3">MWL</option>
             <option value="4">Umm Al-Qura</option>
-            <option value="5">Egyptian General Authority</option>
+            <option value="5">Egyptian Authority</option>
           </select>
         </label>
       </section>
 
       <div id="status" class="status" role="status">Klik peta atau cari lokasi untuk memulai.</div>
 
-      <section class="continuity-card" aria-labelledby="continuity-title">
-        <div class="continuity-copy">
-          <div class="eyebrow">SIMULASI KONTINUITAS</div>
-          <h2 id="continuity-title">Estafet adzan mengikuti rotasi bumi</h2>
-          <p>
-            Titik bercahaya bergerak dari satu zona waktu ke zona berikutnya dalam model 24 jam.
-            Ini memvisualisasikan mengapa waktu adzan dapat saling menyambung secara global.
-          </p>
-          <p class="science-note">
-            <strong>Catatan ilmiah:</strong> simulasi ini adalah model edukasi, bukan bukti bahwa adzan
-            secara harfiah tidak pernah berhenti atau prediksi tentang akhir zaman.
-          </p>
-        </div>
-        <div class="continuity-status">
-          <div class="continuity-location">
-            <span id="continuity-pulse" class="pulse-dot" aria-hidden="true"></span>
-            <div>
-              <span class="label">SEDANG BERLANGSUNG DI</span>
-              <strong id="continuity-location">Makkah, Arab Saudi</strong>
-            </div>
+      <section class="cinema-card" aria-label="Visualisasi waktu adzan global">
+        <div class="cinema-head">
+          <div>
+            <p class="eyebrow">VISUALISASI CAKUPAN 24 JAM</p>
+            <h2 id="coverage-visual-title">Satu ritme, seluruh zona waktu</h2>
           </div>
-          <div class="continuity-progress" aria-hidden="true"><span id="continuity-progress-bar"></span></div>
-          <div class="continuity-meta">
-            <span id="continuity-phase">Fajar → Subuh</span>
-            <button id="continuity-toggle" class="secondary-button" type="button" aria-pressed="true">❚❚ Jeda</button>
-          </div>
-          <div class="prayer-resonance-legend" aria-label="Legenda warna fase adzan">
-            <span><i style="--phase:#4da3ff"></i>Subuh</span>
-            <span><i style="--phase:#ffd166"></i>Terbit</span>
-            <span><i style="--phase:#ff8c42"></i>Dzuhur</span>
-            <span><i style="--phase:#f6b94a"></i>Ashar</span>
-            <span><i style="--phase:#ef6f61"></i>Maghrib</span>
-            <span><i style="--phase:#7c83fd"></i>Isya</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="coverage-card" aria-labelledby="coverage-title">
-        <div>
-          <p class="eyebrow">ANALISIS CAKUPAN HARIAN</p>
-          <h2 id="coverage-title">Apakah adzan ada setiap menit?</h2>
-          <p class="coverage-description">
-            Menggabungkan waktu Subuh, Dzuhur, Ashar, Maghrib, dan Isya dari kota-kota lintas zona waktu,
-            lalu memeriksa 1.440 menit dalam satu hari.
-          </p>
-        </div>
-        <div class="coverage-metric">
-          <strong id="coverage-percent">Belum dihitung</strong>
-          <span>cakupan menit</span>
-        </div>
-        <button id="coverage-button" class="coverage-button" type="button">Analisis cakupan kota</button>
-        <div id="coverage-result" class="coverage-result" role="status">
-          Siap menghitung 20 kota lintas zona waktu.
-        </div>
-        <div class="coverage-visual">
-          <div class="coverage-visual-head">
-            <div>
-              <span class="eyebrow">VISUALISASI 24 JAM</span>
-              <strong id="coverage-visual-title">Klik Analisis untuk memuat kota</strong>
-            </div>
-            <span id="coverage-clock" class="coverage-clock">00:00 UTC</span>
-          </div>
-          <div class="coverage-controls">
-            <button id="cinematic-toggle" class="secondary-button" type="button" aria-pressed="false">✦ Mode sinematik</button>
-            <label>
+          <div class="cinema-actions">
+            <button id="coverage-button" class="primary-button" type="button">Analisis 20 wilayah</button>
+            <button id="cinematic-toggle" class="icon-button" type="button" aria-pressed="false">Mode sinematik</button>
+            <button id="cinema-pause" class="icon-button" type="button">Jeda</button>
+            <label class="speed-control">
               Kecepatan
               <select id="coverage-speed">
-                <option value="160">Lambat</option>
-                <option value="80" selected>Nyata</option>
+                <option value="180">Lambat</option>
+                <option value="90" selected>Nyata</option>
                 <option value="35">Cepat</option>
               </select>
             </label>
           </div>
-          <div id="coverage-timeline" class="coverage-timeline" aria-label="Timeline waktu adzan per kota"></div>
         </div>
+
+        <div class="coverage-summary">
+          <div class="coverage-metric">
+            <strong id="coverage-percent">Belum dihitung</strong>
+            <span>menit tercakup</span>
+          </div>
+          <p id="coverage-result" role="status">Siap menghitung adzan pada 1.440 menit UTC.</p>
+        </div>
+
+        <div class="world-stage">
+          <div id="map" aria-label="Peta dunia interaktif">
+            <div class="map-atmosphere" aria-hidden="true">
+              <span class="atmosphere-band band-one"></span>
+              <span class="atmosphere-band band-two"></span>
+              <span class="atmosphere-core"></span>
+            </div>
+            <div id="map-live-event" class="map-live-event" aria-live="polite">
+              <span id="map-live-time">24 JAM UTC</span>
+              <strong id="map-live-location">Menunggu analisis</strong>
+              <small id="map-live-phase">Mulai pemutaran untuk melihat wilayah aktif</small>
+            </div>
+            <div class="phase-marker" aria-hidden="true">
+              <span id="phase-caption">WAKTU ADZAN · DUNIA</span>
+              <strong id="map-phase-label">SUBUH</strong>
+            </div>
+          </div>
+        </div>
+
+        <div id="coverage-timeline" class="coverage-timeline" aria-label="Timeline waktu adzan 24 jam"></div>
       </section>
 
       <section class="dashboard">
-        <div id="map" aria-label="Peta dunia interaktif">
-          <div class="map-color-fields" aria-hidden="true">
-            <span class="map-color-field field-east"></span>
-            <span class="map-color-field field-west"></span>
-          </div>
-          <div class="map-resonance-wash" aria-hidden="true"></div>
-          <div class="map-resonance-light" aria-hidden="true"></div>
-          <div class="map-phase-name" aria-hidden="true">
-            <span id="map-phase-label">SUBUH</span>
-          </div>
-          <div id="map-live-event" class="map-live-event" aria-live="polite">
-            <span id="map-live-time">24 JAM UTC</span>
-            <strong id="map-live-city">Menunggu analisis</strong>
-            <small id="map-live-phase">Mulai pemutaran untuk melihat kejadian</small>
-          </div>
-        </div>
         <aside class="prayer-panel">
           <div class="place-heading">
-            <div class="location-pin">✦</div>
             <div>
-              <p class="eyebrow">LOKASI TERPILIH</p>
+              <p class="eyebrow">LOKASI DIPILIH</p>
               <h2 id="selected-location">Belum ada lokasi</h2>
-              <p id="coordinates">Klik titik di peta untuk memilih lokasi.</p>
+              <p id="coordinates">Klik peta untuk memilih lokasi.</p>
             </div>
           </div>
           <div id="prayer-list" class="prayer-list">
             <div class="empty-state">Jadwal shalat akan tampil di sini.</div>
           </div>
           <p class="attribution">
-            Data waktu shalat dari <a href="https://aladhan.com/prayer-times-api" target="_blank" rel="noreferrer">AlAdhan API</a>.
-            Waktu dapat berbeda sesuai metode dan kriteria lokal.
+            Jadwal oleh <a href="https://aladhan.com/prayer-times-api" target="_blank" rel="noreferrer">AlAdhan</a>.
+            Visualisasi adalah model edukasi, bukan prediksi akhir zaman.
           </p>
         </aside>
       </section>
     </main>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=9"></script>
+    <script src="app.js?v=11"></script>
   </body>
 </html>

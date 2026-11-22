@@ -18,6 +18,7 @@ Peta dunia interaktif untuk melihat waktu shalat berdasarkan lokasi yang dipilih
 - Timeline 24 jam per kota, pemutaran waktu UTC, dan titik kota aktif di peta seperti visualisasi event global.
 - Mode sinematik, kecepatan pemutaran, panel kejadian aktif, dan efek cahaya sinematik di peta.
 - Visual utama berupa kawasan berwarna lembut; gelombang berubah halus tanpa ketergantungan pada titik/node.
+- Seluruh pengalaman animasi menggunakan engine pemutaran terpadu untuk timeline, atmosfer peta, dan panel fase.
 
 ## Menjalankan lokal
 
