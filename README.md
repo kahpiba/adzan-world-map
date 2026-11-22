@@ -14,7 +14,8 @@ Peta dunia interaktif untuk melihat waktu shalat berdasarkan lokasi yang dipilih
 - Gelombang resonansi berwarna di peta untuk Subuh (biru), Terbit (emas), Dzuhur (oranye),
   Ashar (kuning), Maghrib (merah), dan Isya (ungu).
 - Lapisan cahaya area peta berpindah mengikuti lokasi aktif dan warna peta berubah sesuai fase.
-- Analisis cakupan adzan lintas 164 kota: menghitung 1.440 menit dalam satu hari dan melaporkan celah.
+- Analisis cakupan adzan lintas 381 kota unik: menghitung 1.440 menit dalam satu hari dan melaporkan celah.
+- Tidak menggunakan data populasi Muslim; seluruh kota dihitung berdasarkan koordinat dan metode waktu shalat.
 - Timeline 24 jam per kota, pemutaran waktu UTC, dan titik kota aktif di peta seperti visualisasi event global.
 - Mode sinematik, kecepatan pemutaran, panel kejadian aktif, dan efek cahaya sinematik di peta.
 - Visual utama berupa kawasan berwarna lembut; gelombang berubah halus tanpa ketergantungan pada titik/node.
